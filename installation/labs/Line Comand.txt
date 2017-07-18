@@ -1,0 +1,118 @@
+###  Configure vm.swappiness
+
+sudo sysctl vm.swappiness=1
+
+### Install Maria DB.
+
+sudo yum install mariadb-server
+
+### Iniciar Maria DB.
+
+sudo systemctl start mariadb
+
+### Verificar status
+
+sudo systemctl status mariadb
+
+### Habilitar
+
+sudo systemctl enable mariadb
+
+### Finalizar instalacion:
+
+cd /usr/bin/
+
+sudo mysql_secure_installation
+
+## reiniciar servicio mysql
+
+
+#########   REPLICACION
+
+#######(Master)
+
+mysql -u user -p password
+
+GRANT REPLICATION SLAVE ON *.* TO 'root'@'ip' IDENTIFIED BY 'jaimito12';
+
+SET GLOBAL binlog_format = 'ROW'; 
+
+FLUSH TABLES WITH READ LOCK;
+
+SHOW MASTER STATUS;
+
+UNLOCK TABLES;
+
+#######(Maquina dos)
+
+
+CHANGE MASTER TO MASTER_HOST='HostMaster', MASTER_USER='userReplica', MASTER_PASSWORD='passwordReplica', MASTER_LOG_FILE='', MASTER_LOG_POS=master file offset;
+
+START SLAVE;
+
+SHOW SLAVE STATUS \G
+
+
+############# REPOSITORIOS
+
+cd /etc/yum.repos.d
+
+wget https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/cloudera-manager.repo
+
+yum-config-manager --enable cloudera-manager
+
+yum update -y
+
+###########INSTALL JDK
+
+yum install -y oracle-j2sdk1.7
+
+######### Conector JDBC
+
+yum install -y mysql-connector-java
+
+
+############## USERS DB
+
+wget https://gist.githubusercontent.com/guevaralb/622a98030b3f63bd7d96b4f1aa7dcd5b/raw/b01a3df7d6df2b006d1000b9fa1a8055a8afc15d/SQL%2520default%2520database -O cloudera_init_mariadb.sql
+
+mysql -u root -p < cloudera_init_mariadb.sql
+
+
+sudo 
+
+################# Installar paquetes del servidor Cloudera Manager
+
+Sudo yum install cloudera-manager-daemons cloudera-manager-server
+
+
+################# Start Server
+
+/usr/share/cmf/schema/scm_prepare_database.sh mysql -uroot -p scm scm scm
+
+Sudo service cloudera-scm-server start
+
+
+################# View Log
+
+tail -f /var/log/cloudera-scm-server/cloudera-scm-server.log
+
+
+################# Login in to web console
+
+http://Server host:7180  
+admin - admin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
